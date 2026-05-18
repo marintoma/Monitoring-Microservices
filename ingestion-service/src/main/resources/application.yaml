@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: ingestion-service
+
+server:
+  port: 8080
+
+services:
+  metrics-url: http://localhost:8081
+  logs-url: http://localhost:8082
+
+app:
+  batch:
+    max-size: 1000
+
+management:
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always

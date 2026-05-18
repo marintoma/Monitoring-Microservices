@@ -12,6 +12,7 @@
     <modules>
         <module>metrics-service</module>
         <module>logs-service</module>
+        <module>ingestion-service</module>
     </modules>
 
     <parent>

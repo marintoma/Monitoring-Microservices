@@ -1,4 +1,4 @@
-package com.monitoring.logs.exception;
+package com.monitoring.ingestion.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
