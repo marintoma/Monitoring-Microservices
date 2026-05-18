@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: metrics-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/metrics
+    username: monitoring
+    password: monitoring
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+
+app:
+  batch:
+    max-size: 1000
