@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U monitoring"]
+      test: ["CMD-SHELL", "pg_isready -U monitoring -d metrics"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U monitoring"]
+      test: ["CMD-SHELL", "pg_isready -U monitoring -d logs"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +36,7 @@ services:
     ports:
       - "5434:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U monitoring"]
+      test: ["CMD-SHELL", "pg_isready -U monitoring -d notifications"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -54,3 +54,88 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  metrics-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: metrics-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://metrics-db:5432/metrics
+      SPRING_DATASOURCE_USERNAME: monitoring
+      SPRING_DATASOURCE_PASSWORD: monitoring
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: monitoring
+      SPRING_RABBITMQ_PASSWORD: monitoring
+    depends_on:
+      metrics-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  logs-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: logs-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://logs-db:5432/logs
+      SPRING_DATASOURCE_USERNAME: monitoring
+      SPRING_DATASOURCE_PASSWORD: monitoring
+    depends_on:
+      logs-db:
+        condition: service_healthy
+
+  ingestion-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: ingestion-service
+    ports:
+      - "8080:8080"
+    environment:
+      SERVICES_METRICS_URL: http://metrics-service:8081
+      SERVICES_LOGS_URL: http://logs-service:8082
+    depends_on:
+      - metrics-service
+      - logs-service
+
+  query-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: query-service
+    ports:
+      - "8083:8083"
+    environment:
+      SERVICES_METRICS_URL: http://metrics-service:8081
+      SERVICES_LOGS_URL: http://logs-service:8082
+    depends_on:
+      - metrics-service
+      - logs-service
+
+  notification-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notifications-db:5432/notifications
+      SPRING_DATASOURCE_USERNAME: monitoring
+      SPRING_DATASOURCE_PASSWORD: monitoring
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: monitoring
+      SPRING_RABBITMQ_PASSWORD: monitoring
+    depends_on:
+      notifications-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
