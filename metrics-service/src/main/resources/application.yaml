@@ -1,6 +1,10 @@
 spring:
   application:
     name: metrics-service
+  data:
+    web:
+      pageable:
+        max-page-size: 200
   datasource:
     url: jdbc:postgresql://localhost:5432/metrics
     username: monitoring

@@ -1,4 +1,4 @@
-package com.monitoring.ingestion.config;
+package com.monitoring.query.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

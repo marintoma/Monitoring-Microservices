@@ -1,6 +1,10 @@
 spring:
   application:
     name: logs-service
+  data:
+    web:
+      pageable:
+        max-page-size: 200
   datasource:
     url: jdbc:postgresql://localhost:5433/logs
     username: monitoring
