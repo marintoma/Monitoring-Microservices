@@ -13,4 +13,12 @@
     <artifactId>metrics-service</artifactId>
     <name>metrics-service</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <version>4.0.6</version>
+        </dependency>
+    </dependencies>
+
 </project>

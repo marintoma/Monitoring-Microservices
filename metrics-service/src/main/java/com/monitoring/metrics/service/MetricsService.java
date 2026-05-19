@@ -1,5 +1,6 @@
 package com.monitoring.metrics.service;
 
+import com.monitoring.metrics.event.MetricEventPublisher;
 import com.monitoring.metrics.repo.MetricsRepository;
 import com.monitoring.metrics.common.BatchIngestResponse;
 import com.monitoring.metrics.exception.BatchSizeExceededException;
@@ -21,6 +22,7 @@ import java.util.List;
 public class MetricsService {
 
     private final MetricsRepository repo;
+    private final MetricEventPublisher publisher;
 
     @Value("${app.batch.max-size}")
     private int maxBatchSize;
@@ -35,8 +37,10 @@ public class MetricsService {
                 .build();
 
         Metric saved = repo.save(metric);
+        MetricResponse reponse = toResponse(saved);
 
-        return toResponse(saved);
+        publisher.publish(reponse);
+        return reponse;
     }
 
     @Transactional
